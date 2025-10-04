@@ -1,11 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Recruitment_System.Data;
+
 namespace Recruitment_System.Services
 {
     public class AuthService
     {
-        private readonly applicationDbContext _db;
+        private readonly ApplicationDbContext _db;
         private readonly JwtService _jwt;
 
-        public AuthService(applicationDbContext db, JwtService jwt)
+        public AuthService(ApplicationDbContext db, JwtService jwt)
         {
             _db = db;
             _jwt = jwt;
