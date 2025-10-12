@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
@@ -10,7 +10,7 @@
   },
   "profiles": {
     "http": {
-      "commandName": "Project",
+      "commandName": "IISExpress",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",

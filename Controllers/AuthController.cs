@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recruitment_System.Dto_s;
 using Recruitment_System.Services;
+using System.Security.Claims;
 
 namespace Recruitment_System.Controllers
 {
@@ -27,28 +28,58 @@ namespace Recruitment_System.Controllers
                     Message = "Invalid request data"
                 });
 
-            var (ok, message, token, fullName, email, roles) =
-                await _authService.LoginAsync(request.Email, request.Password, request.RememberMe);
+            var result = await _authService.LoginAsync(request.Email, request.Password, request.RememberMe);
 
-            if (!ok)
-                return Unauthorized(new LoginResponse
+            if (!result.IsSuccess)
+                return BadRequest(result);        
+
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin,HR")]
+        [HttpPost("admin-register")]
+        public async Task<IActionResult> AdminRegister([FromBody] AdminRegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new RegisterResponse
                 {
                     IsSuccess = false,
-                    Message = message
+                    Message = "Invalid request data"
                 });
 
-            var expiryHours = request.RememberMe ? 168 : 24;
+            var result = await _authService.AdminRegisterAsync(request, GetCurrentUserId());
 
-            return Ok(new LoginResponse
-            {
-                IsSuccess = true,
-                Message = message,
-                Token = token,
-                FullName = fullName,
-                Email = email,
-                Roles = roles.ToList(),
-                ExpiresAt = DateTime.UtcNow.AddHours(expiryHours)
-            });
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
         }
+
+        [AllowAnonymous]
+        [HttpPost("candidate-register")]
+        public async Task<IActionResult> CandidateRegister([FromBody] CandidateRegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new RegisterResponse
+                {
+                    IsSuccess = false,
+                    Message = "Invalid request data"
+                });
+
+            var result = await _authService.CandidateRegisterAsync(request);
+
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdClaim, out int userId) ? userId : 0;
+        }
+
+
     }
 }
