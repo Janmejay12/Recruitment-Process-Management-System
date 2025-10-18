@@ -1,6 +1,38 @@
 [
   {
     "ContainingType": "Recruitment_System.Controllers.AuthController",
+    "Method": "AdminRegister",
+    "RelativePath": "api/Auth/admin-register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.AdminRegisterRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.AuthController",
+    "Method": "CandidateRegister",
+    "RelativePath": "api/Auth/candidate-register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.CandidateRegisterRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/Auth/login",
     "HttpMethod": "POST",

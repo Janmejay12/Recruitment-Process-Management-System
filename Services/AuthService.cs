@@ -74,6 +74,10 @@ namespace Recruitment_System.Services
                     return new RegisterResponse { IsSuccess = false, Message = "Invalid role" };
                 }
 
+                // Only Admin can create Admin users
+                if (request.Role == "Admin" && !adminRoles.Contains("Admin"))
+                    return new RegisterResponse { IsSuccess = false, Message = "Only Admin can create Admin users" };
+
                 var user = new User
                 {
                     FullName = request.FullName,
