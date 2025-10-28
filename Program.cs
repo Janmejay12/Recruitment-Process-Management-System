@@ -56,6 +56,7 @@ builder.Services.AddAuthorization();
 // Add custom services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JobService>();
 
 // Add Swagger with JWT Authorization
 builder.Services.AddEndpointsApiExplorer();
