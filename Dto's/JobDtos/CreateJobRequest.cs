@@ -40,5 +40,24 @@ namespace Recruitment_System.Dto_s.JobDtos
         public int NumberOfPositions { get; set; } = 1;
 
         public DateTime? ApplicationDeadline { get; set; }
+        // Optional skills to map at creation time
+        public List<CreateJobSkillItem>? Skills { get; set; }
+
+        public class CreateJobSkillItem
+        {
+
+            [Required]
+            public int SkillId { get; set; }
+
+            [Required]
+            public bool IsMandatory { get; set; } = true;
+
+            [Range(1, 3, ErrorMessage = "Priority must be 1 (High), 2 (Medium) or 3 (Low)")]
+            public int Priority { get; set; } = 1;
+
+            [StringLength(500)]
+            public string? Notes { get; set; }
+
+        }
     }
 }
