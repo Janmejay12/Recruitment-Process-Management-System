@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recruitment_System.Data;
 
@@ -11,9 +12,11 @@ using Recruitment_System.Data;
 namespace Recruitment_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251031143853_AddJobAndCandidateEntities")]
+    partial class AddJobAndCandidateEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,7 @@ namespace Recruitment_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CandidateId"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("CvPath")
                         .HasMaxLength(500)
@@ -50,9 +51,7 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
@@ -64,19 +63,11 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("CandidateId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Candidates", (string)null);
+                    b.ToTable("Candidates");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.CandidateSkill", b =>
@@ -91,9 +82,7 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ProficiencyLevel")
                         .HasMaxLength(20)
@@ -103,21 +92,18 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("YearsExperience")
                         .HasColumnType("int");
 
                     b.HasKey("CandidateSkillId");
 
+                    b.HasIndex("CandidateId");
+
                     b.HasIndex("SkillId");
 
-                    b.HasIndex("CandidateId", "SkillId")
-                        .IsUnique();
-
-                    b.ToTable("CandidateSkills", (string)null);
+                    b.ToTable("CandidateSkills");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.Job", b =>
@@ -530,17 +516,6 @@ namespace Recruitment_System.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Recruitment_System.Entities.Candidate", b =>
-                {
-                    b.HasOne("Recruitment_System.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("Recruitment_System.Entities.Candidate", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Recruitment_System.Entities.CandidateSkill", b =>
                 {
                     b.HasOne("Recruitment_System.Entities.Candidate", "Candidate")
@@ -552,7 +527,7 @@ namespace Recruitment_System.Migrations
                     b.HasOne("Recruitment_System.Entities.Skill", "Skill")
                         .WithMany("CandidateSkills")
                         .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Candidate");

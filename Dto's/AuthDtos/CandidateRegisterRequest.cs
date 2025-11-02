@@ -22,5 +22,20 @@ namespace Recruitment_System.Dto_s
 
         [Phone(ErrorMessage = "Invalid phone number")]
         public string? Phone { get; set; }
+
+        public string? CvPath { get; set; }
+
+        public List<CandidateSkillRequest> Skills { get; set; } = new();
+    }
+    public class CandidateSkillRequest
+    {
+        [Required(ErrorMessage = "SkillId is required")]
+        public int SkillId { get; set; }
+
+        [Range(0, 50, ErrorMessage = "Years of experience must be between 0 and 50")]
+        public int YearsExperience { get; set; }
+
+        [StringLength(20, ErrorMessage = "Proficiency level too long")]
+        public string? ProficiencyLevel { get; set; } // Beginner, Intermediate, Advanced, Expert
     }
 }

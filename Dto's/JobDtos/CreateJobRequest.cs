@@ -9,7 +9,7 @@ namespace Recruitment_System.Dto_s.JobDtos
         public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Job description is required")]
-        [StringLength(2000, MinimumLength = 50, ErrorMessage = "Description must be between 50 and 2000 characters")]
+        [StringLength(2000, MinimumLength = 10, ErrorMessage = "Description must be between 50 and 2000 characters")]
         public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Location is required")]

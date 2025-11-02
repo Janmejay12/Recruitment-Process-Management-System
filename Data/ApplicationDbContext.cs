@@ -17,6 +17,9 @@ namespace Recruitment_System.Data
         public DbSet<Skill> Skills { get; set; }
         public DbSet<JobSkill> JobSkills { get; set; }
         public DbSet<JobClosure> JobClosures { get; set; }
+        public DbSet<Candidate> Candidates { get; set; }
+        public DbSet<CandidateSkill> CandidateSkills { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,7 +33,8 @@ namespace Recruitment_System.Data
             ConfigureSkill(modelBuilder);
             ConfigureJobSkill(modelBuilder);
             ConfigureJobClosure(modelBuilder);
-
+            ConfigureCandidate(modelBuilder);
+            ConfigureCandidateSkill(modelBuilder);
             // Seed data
             SeedData(modelBuilder);
         }
@@ -178,6 +182,66 @@ namespace Recruitment_System.Data
             // Default value
             modelBuilder.Entity<JobClosure>()
                 .Property(jc => jc.ClosedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+        }
+
+        private void ConfigureCandidate(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Candidate>()
+                .ToTable("Candidates");
+
+            modelBuilder.Entity<Candidate>()
+                .HasKey(c => c.CandidateId);
+
+            modelBuilder.Entity<Candidate>()
+                .HasOne(c => c.User)
+                .WithOne()
+                .HasForeignKey<Candidate>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Candidate>()
+                .Property(c => c.IsActive)
+                .HasDefaultValue(true);
+
+            modelBuilder.Entity<Candidate>()
+                .Property(c => c.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<Candidate>()
+                .Property(c => c.UpdatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+        }
+
+        private void ConfigureCandidateSkill(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CandidateSkill>()
+                .ToTable("CandidateSkills");
+
+            modelBuilder.Entity<CandidateSkill>()
+                .HasKey(cs => cs.CandidateSkillId);
+
+            modelBuilder.Entity<CandidateSkill>()
+                .HasOne(cs => cs.Candidate)
+                .WithMany(c => c.CandidateSkills)
+                .HasForeignKey(cs => cs.CandidateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CandidateSkill>()
+                .HasOne(cs => cs.Skill)
+                .WithMany(s => s.CandidateSkills)
+                .HasForeignKey(cs => cs.SkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CandidateSkill>()
+                .HasIndex(cs => new { cs.CandidateId, cs.SkillId })
+                .IsUnique();
+
+            modelBuilder.Entity<CandidateSkill>()
+                .Property(cs => cs.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<CandidateSkill>()
+                .Property(cs => cs.UpdatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
         }
 

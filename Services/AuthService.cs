@@ -155,6 +155,51 @@ namespace Recruitment_System.Services
                 _db.UserRoles.Add(userRole);
                 await _db.SaveChangesAsync();
 
+                var candidate = new Candidate
+                {
+                    FullName = request.FullName,
+                    Email = request.Email,
+                    Phone = request.Phone,
+                    CvPath = request.CvPath,
+                    ProfileStatus = "Applied",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                _db.Candidates.Add(candidate);
+                await _db.SaveChangesAsync();
+
+                // ?? 5. Add candidate skills (if provided)
+                if (request.Skills != null && request.Skills.Any())
+                {
+                    // Validate skill IDs
+                    var skillIds = request.Skills.Select(s => s.SkillId).Distinct().ToList();
+                    var validSkillIds = await _db.Skills
+                        .Where(s => skillIds.Contains(s.SkillId) && s.IsActive)
+                        .Select(s => s.SkillId)
+                        .ToListAsync();
+
+                    var invalidSkills = skillIds.Except(validSkillIds).ToList();
+                    if (invalidSkills.Any())
+                        return new RegisterResponse { IsSuccess = false, Message = $"Invalid or inactive skills: {string.Join(", ", invalidSkills)}" };
+
+                    // Map skills to CandidateSkill entities
+                    var candidateSkills = request.Skills.Select(s => new CandidateSkill
+                    {
+                        CandidateId = candidate.CandidateId,
+                        SkillId = s.SkillId,
+                        YearsExperience = s.YearsExperience,
+                        ProficiencyLevel = s.ProficiencyLevel ?? "Beginner",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }).ToList();
+
+                    _db.CandidateSkills.AddRange(candidateSkills);
+                    await _db.SaveChangesAsync();
+                }
+
+
                 return new RegisterResponse
                 {
                     IsSuccess = true,

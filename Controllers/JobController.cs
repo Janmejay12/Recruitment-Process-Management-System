@@ -39,7 +39,7 @@ namespace Recruitment_System.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getJobs()
+        public async Task<IActionResult> GetJobs()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Recruitment_System.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetJob(int jobId)
+        public async Task<IActionResult> GetJob([FromRoute] int id)
         {
             try
             {
@@ -71,13 +71,13 @@ namespace Recruitment_System.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Recruiter,Admin,HR")]
-        public async Task<IActionResult> UpdateJob([FromBody]UpdateJobRequest request, int jobId)
+        public async Task<IActionResult> UpdateJob([FromRoute] int id, [FromBody] UpdateJobRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { IsSuccess = false, Message = "Invalid request data", Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
             try
             {
-                var result = await _jobService.UpdateJobAsync(id, request, GetCurrentUserId());
+                var result = await _jobService.UpdateJobAsync(id, request);
                 if (result == null)
                     return NotFound(new { IsSuccess = false, Message = "Job not found" });
 
@@ -91,7 +91,7 @@ namespace Recruitment_System.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Recruiter,Admin")]
-        public async Task<IActionResult> DeleteJob(int jobId)
+        public async Task<IActionResult> DeleteJob([FromRoute] int id)
         {
             try
             {
@@ -106,6 +106,86 @@ namespace Recruitment_System.Controllers
                 return BadRequest(new { IsSuccess = false, Message = ex.Message });
             }
         }
+
+        [HttpPut("{id}/hold")]
+        [Authorize(Roles = "Recruiter,Admin,HR")]
+        public async Task<IActionResult> PutOnHold([FromRoute] int id, [FromBody] OnHoldOrOnCloseRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { IsSuccess = false, Message = "Invalid request", Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+
+            try
+            {
+                var result = await _jobService.PutJobOnHoldAsync(id, request.Reason);
+                return Ok(new { IsSuccess = true, Message = "Job put on hold", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        
+        [HttpPut("{id}/resume")]
+        [Authorize(Roles = "Recruiter,Admin,HR")]
+        public async Task<IActionResult> Resume([FromRoute] int id)
+        {
+            try
+            {
+                var result = await _jobService.ResumeJobAsync(id);
+                return Ok(new { IsSuccess = true, Message = "Job resumed", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        
+        [HttpPut("{id}/close")]
+        [Authorize(Roles = "Recruiter,Admin,HR")]
+        public async Task<IActionResult> CloseJob([FromRoute] int id, [FromBody] OnHoldOrOnCloseRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { IsSuccess = false, Message = "Invalid request", Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+
+            try
+            {
+                var result = await _jobService.CloseJobAsync(id, request.Reason, GetCurrentUserId());
+                return Ok(new { IsSuccess = true, Message = "Job closed", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+       
+        [HttpPut("{id}/close-with-candidate")]
+        [Authorize(Roles = "Admin,HR")]
+        public async Task<IActionResult> CloseWithCandidate([FromRoute] int id, [FromBody] CloseWithCandidateRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { IsSuccess = false, Message = "Invalid request", Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+
+            try
+            {
+                var result = await _jobService.CloseJobWithCandidateAsync(
+                    id,
+                    request.CandidateId,
+                    request.SelectionDate,
+                    request.Reason,
+                    request.Notes,
+                    GetCurrentUserId());
+
+                return Ok(new { IsSuccess = true, Message = "Job closed with selected candidate", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

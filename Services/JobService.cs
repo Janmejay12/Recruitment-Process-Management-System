@@ -5,7 +5,7 @@ using Recruitment_System.Entities;
 
 namespace Recruitment_System.Services
 {
-    public class JobService
+    public class   JobService
     {
         private readonly ApplicationDbContext _db;
 
@@ -78,7 +78,7 @@ namespace Recruitment_System.Services
             if (result == null) throw new InvalidOperationException("Failed to load created job.");
             return result;
         }
-        public async Task<JobResponse> GetJobByIdAsync(int jobId)
+        public async Task<JobResponse?> GetJobByIdAsync(int jobId)
         {
             var job = await _db.Jobs
                 .Include(j => j.CreatedByUser)
@@ -125,12 +125,14 @@ namespace Recruitment_System.Services
 
         public async Task<List<JobListResponse>> GetJobAsync()
         {
-            var query = _db.Jobs
+            var jobs = await _db.Jobs
                 .Include(j => j.CreatedByUser)
                  .Include(j => j.JobSkills)
-                .Where(j => j.IsActive);
+                .Where(j => j.IsActive)
+                .OrderByDescending(j => j.CreatedAt)
+                .ToListAsync();
 
-            return query.Select(j => new JobListResponse
+            return jobs.Select(j => new JobListResponse
             {
                 JobId = j.JobId,
                 Title = j.Title,
@@ -148,7 +150,7 @@ namespace Recruitment_System.Services
             }).ToList();
         }
 
-        public async Task<JobResponse> UpdateJobAsync(int jobId, UpdateJobRequest request)
+        public async Task<JobResponse?> UpdateJobAsync(int jobId, UpdateJobRequest request)
         {
             var job = await _db.Jobs
                 .Include(j => j.CreatedByUser)
@@ -190,6 +192,118 @@ namespace Recruitment_System.Services
 
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<JobResponse?> PutJobOnHoldAsync(int jobId, string reason)
+        {
+
+            var job = await _db.Jobs.FirstOrDefaultAsync(j => j.JobId == jobId && j.IsActive);
+            if (job == null) throw new InvalidOperationException("Job not found or inactive.");
+            if (job.Status == "Closed") throw new InvalidOperationException("Cannot change a closed job.");
+            if (job.Status != "Open") throw new InvalidOperationException("Only Open jobs can be put on hold.");
+
+            job.Status = "OnHold";
+            job.OnHoldReason = reason;
+            job.OnHoldAt = DateTime.UtcNow;
+            job.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return await GetJobByIdAsync(jobId);
+        }
+
+        public async Task<JobResponse?> ResumeJobAsync(int jobId)
+        {
+            var job = await _db.Jobs.FirstOrDefaultAsync(j => j.JobId == jobId && j.IsActive);
+            if (job == null) throw new InvalidOperationException("Job not found or inactive.");
+            if (job.Status == "Closed") throw new InvalidOperationException("Cannot change a closed job.");
+            if (job.Status != "OnHold") throw new InvalidOperationException("Only OnHold jobs can be resumed.");
+
+            job.Status = "Open";
+            job.OnHoldReason = null;
+            job.OnHoldAt = null;
+            job.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+            return await GetJobByIdAsync(jobId);
+        }
+
+
+        public async Task<JobResponse?> CloseJobAsync(int jobId, string reason, int userId)
+        { 
+
+            var job = await _db.Jobs.FirstOrDefaultAsync(j => j.JobId == jobId && j.IsActive);
+            if (job == null) throw new InvalidOperationException("Job not found or inactive.");
+            if (job.Status == "Closed") throw new InvalidOperationException("Job is already closed.");
+            
+            using var tx = await _db.Database.BeginTransactionAsync();
+
+            job.Status = "Closed";
+            job.ClosedReason = reason;
+            job.ClosedAt = DateTime.UtcNow;
+            job.UpdatedAt = DateTime.UtcNow;
+
+            var closure = new JobClosure
+            {
+                JobId = job.JobId,
+                ClosureType = "General",
+                SelectedCandidateId = null,
+                SelectionDate = null,
+                ClosureReason = reason,
+                ClosedBy = userId,
+                ClosedAt = DateTime.UtcNow,
+                Notes = null
+            };
+
+            _db.JobClosures.Add(closure);
+            await _db.SaveChangesAsync();
+
+            await tx.CommitAsync();
+
+            return await GetJobByIdAsync(jobId);
+        }
+
+        public async Task<JobResponse?> CloseJobWithCandidateAsync(int jobId, int selectedCandidateId, DateTime selectionDate, string reason, string? notes, int userId)
+        {
+            if (selectedCandidateId <= 0) throw new InvalidOperationException("Selected candidate id is required.");
+            if (string.IsNullOrWhiteSpace(reason)) throw new InvalidOperationException("Closure reason is required.");
+
+            var candidate = await _db.Candidates.FindAsync(selectedCandidateId);
+            if (candidate == null) throw new InvalidOperationException("Selected candidate not found.");
+
+            var job = await _db.Jobs.FirstOrDefaultAsync(j => j.JobId == jobId && j.IsActive);
+            if (job == null) throw new InvalidOperationException("Job not found or inactive.");
+           
+            if (job.Status == "Closed") throw new InvalidOperationException("Job is already closed.");
+            
+            if (job.Status != "Open" && job.Status != "OnHold")
+                throw new InvalidOperationException("Only Open or OnHold jobs can be closed.");
+
+            using var tx = await _db.Database.BeginTransactionAsync();
+
+            job.Status = "Closed";
+            job.ClosedReason = reason;
+            job.ClosedAt = DateTime.UtcNow;
+            job.UpdatedAt = DateTime.UtcNow;
+
+            var closure = new JobClosure
+            {
+                JobId = job.JobId,
+                ClosureType = "Selected",
+                SelectedCandidateId = selectedCandidateId,
+                SelectionDate = selectionDate,
+                ClosureReason = reason,
+                ClosedBy = userId,
+                ClosedAt = DateTime.UtcNow,
+                Notes = notes
+            };
+
+            _db.JobClosures.Add(closure);
+            await _db.SaveChangesAsync();
+
+            await tx.CommitAsync();
+
+            return await GetJobByIdAsync(jobId);
         }
 
     }

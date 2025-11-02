@@ -173,4 +173,3 @@ D:\Recruitment System\Recruitment System\obj\Debug\net8.0\refint\Recruitment Sys
 D:\Recruitment System\Recruitment System\obj\Debug\net8.0\Recruitment System.pdb
 D:\Recruitment System\Recruitment System\obj\Debug\net8.0\Recruitment System.genruntimeconfig.cache
 D:\Recruitment System\Recruitment System\obj\Debug\net8.0\ref\Recruitment System.dll
-D:\Recruitment System\Recruitment System\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
