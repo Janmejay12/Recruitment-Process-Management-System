@@ -9,11 +9,16 @@ namespace Recruitment_System.Entities
         [Key]
         public int CandidateId { get; set; }
 
-        [Required]
-        public int UserId { get; set; }  
+       
+        public int? UserId { get; set; }  
 
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
+
+        public int? CreatedBy { get; set; }
+
+        [ForeignKey("CreatedBy")]
+        public virtual User? CreatedByUser { get; set; }
 
         [Required]
         [StringLength(100)]

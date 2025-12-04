@@ -237,7 +237,7 @@ namespace Recruitment_System.Services
             if (job.Status == "Closed") throw new InvalidOperationException("Job is already closed.");
             
             using var tx = await _db.Database.BeginTransactionAsync();
-
+           
             job.Status = "Closed";
             job.ClosedReason = reason;
             job.ClosedAt = DateTime.UtcNow;

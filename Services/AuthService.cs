@@ -157,6 +157,7 @@ namespace Recruitment_System.Services
 
                 var candidate = new Candidate
                 {
+                    User = user,
                     FullName = request.FullName,
                     Email = request.Email,
                     Phone = request.Phone,

@@ -35,6 +35,9 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
                     b.Property<string>("CvPath")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -68,13 +71,16 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("CandidateId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Candidates", (string)null);
                 });
@@ -532,11 +538,16 @@ namespace Recruitment_System.Migrations
 
             modelBuilder.Entity("Recruitment_System.Entities.Candidate", b =>
                 {
+                    b.HasOne("Recruitment_System.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy");
+
                     b.HasOne("Recruitment_System.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Recruitment_System.Entities.Candidate", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("User");
                 });

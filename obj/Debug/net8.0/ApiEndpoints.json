@@ -48,6 +48,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Recruitment_System.Controllers.CandidateController",
+    "Method": "CreateCandidate",
+    "RelativePath": "api/Candidate/manual",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.CandidateDtos.CreateCandidateRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Recruitment_System.Controllers.JobController",
     "Method": "CreateJob",
     "RelativePath": "api/Job",
@@ -115,6 +131,85 @@
     "Method": "DeleteJob",
     "RelativePath": "api/Job/{id}",
     "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.JobController",
+    "Method": "CloseJob",
+    "RelativePath": "api/Job/{id}/close",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.JobDtos.OnHoldOrOnCloseRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.JobController",
+    "Method": "CloseWithCandidate",
+    "RelativePath": "api/Job/{id}/close-with-candidate",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.JobDtos.CloseWithCandidateRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.JobController",
+    "Method": "PutOnHold",
+    "RelativePath": "api/Job/{id}/hold",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.JobDtos.OnHoldOrOnCloseRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.JobController",
+    "Method": "Resume",
+    "RelativePath": "api/Job/{id}/resume",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
