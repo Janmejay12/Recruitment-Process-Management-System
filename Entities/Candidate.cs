@@ -13,7 +13,7 @@ namespace Recruitment_System.Entities
         public int? UserId { get; set; }  
 
         [ForeignKey("UserId")]
-        public virtual User User { get; set; } = null!;
+        public virtual User? User { get; set; } = null!;
 
         public int? CreatedBy { get; set; }
 

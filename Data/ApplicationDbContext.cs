@@ -193,11 +193,21 @@ namespace Recruitment_System.Data
             modelBuilder.Entity<Candidate>()
                 .HasKey(c => c.CandidateId);
 
+            // FK: UserId ? User
             modelBuilder.Entity<Candidate>()
                 .HasOne(c => c.User)
-                .WithOne()
-                .HasForeignKey<Candidate>(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .WithMany() 
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+
+            // FK: CreatedBy ? User
+            modelBuilder.Entity<Candidate>()
+                .HasOne(c => c.CreatedByUser)
+                .WithMany() 
+                .HasForeignKey(c => c.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
 
             modelBuilder.Entity<Candidate>()
                 .Property(c => c.IsActive)
@@ -265,7 +275,7 @@ namespace Recruitment_System.Data
                     UserId = 1,
                     FullName = "System Administrator",
                     Email = "admin@recruitment.com",
-                    PasswordHash = "$2a$12$teJFviM61rhCz8dzSWgYIuhWug2TblSyuFgn6yYOEQhELKnKoc2I6",
+                    PasswordHash = "$2a$12$teJFviM61rhCz8dzSWgYIuhWug2TblSyuFgn6yYOEQhELKnKoc2I6", //Admin@123  
                     Status = "Active"
                 }
             );

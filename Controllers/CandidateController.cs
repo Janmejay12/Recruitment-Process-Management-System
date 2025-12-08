@@ -41,6 +41,21 @@ namespace Recruitment_System.Controllers
             }
         }
 
+        [HttpPost ("upload-resume")]
+        [Authorize(Roles = "Recruiter,Admin,HR")]
+        public async Task<IActionResult> UploadResume([FromForm] ResumeUploadRequest request)
+        {
+            try
+            {
+                var result = await _candidateService.UploadResumeAsync(request.File, GetCurrentUserId());
+                return Ok(new { IsSuccess = true, Message = "Resume processed successfully", Data = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

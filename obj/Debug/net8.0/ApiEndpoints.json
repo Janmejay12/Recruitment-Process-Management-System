@@ -64,6 +64,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Recruitment_System.Controllers.CandidateController",
+    "Method": "UploadResume",
+    "RelativePath": "api/Candidate/upload-resume",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Recruitment_System.Controllers.JobController",
     "Method": "CreateJob",
     "RelativePath": "api/Job",

@@ -1,7 +1,11 @@
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.EntityFrameworkCore;
 using Recruitment_System.Data;
 using Recruitment_System.Dto_s.CandidateDtos;
 using Recruitment_System.Entities;
+using System.Text.RegularExpressions;
+
 
 namespace Recruitment_System.Services
 {
@@ -31,7 +35,6 @@ namespace Recruitment_System.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 IsActive = true,
-                UserId = null, // Manual candidates don't have User accounts initially
                 CreatedBy = createdByUserId // Track who created this candidate profile
             };
 
@@ -105,6 +108,125 @@ namespace Recruitment_System.Services
                     ProficiencyLevel = cs.ProficiencyLevel
                 }).ToList()
             };
+        }
+
+        public async Task<CandidateResponse> UploadResumeAsync(IFormFile file, int uploadedByUserId)
+        {
+            if (file == null || file.Length == 0)
+                throw new InvalidOperationException("Invalid file");
+
+            using var tx = await _db.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 1. Save file
+                string uploadsFolder = Path.Combine("wwwroot", "uploads", "cvs");
+                Directory.CreateDirectory(uploadsFolder);
+
+                string fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                string filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // 2. Extract text using iText7
+                string text = ExtractPdfText(filePath);
+
+                if (string.IsNullOrWhiteSpace(text))
+                    throw new InvalidOperationException("Unable to extract text from the resume.");
+
+                // 3. Extract email, phone, name
+                string email = Regex.Match(text, @"[A-Za-z0-9\._%+-]+@[A-Za-z0-9\.-]+\.[A-Za-z]{2,}").Value;
+                string phone = Regex.Match(text, @"\+?\d{10,13}").Value;
+
+                string name = text.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                                  .FirstOrDefault()?.Trim() ?? "Unknown";
+
+                // 4. Create candidate
+                var candidate = new Candidate
+                {
+                    FullName = name,
+                    Email = email,
+                    Phone = phone,
+                    CvPath = "/uploads/cvs/" + fileName,
+                    ProfileStatus = "Imported",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true,
+                    CreatedBy = uploadedByUserId
+                };
+
+                _db.Candidates.Add(candidate);
+                await _db.SaveChangesAsync();
+
+                // 5. Auto-detect skills from resume text
+                var allSkills = await _db.Skills.Where(s => s.IsActive).ToListAsync();
+                var matchedSkills = new List<CandidateSkill>();
+                var matchedSkillResponses = new List<CandidateSkillResponse>();
+
+                foreach (var skill in allSkills)
+                {
+                    if (text.Contains(skill.SkillName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedSkills.Add(new CandidateSkill
+                        {
+                            CandidateId = candidate.CandidateId,
+                            SkillId = skill.SkillId,
+                            YearsExperience = 0,
+                            ProficiencyLevel = "Beginner"
+                        });
+
+                        matchedSkillResponses.Add(new CandidateSkillResponse
+                        {
+                            SkillId = skill.SkillId,
+                            SkillName = skill.SkillName,
+                            Category = skill.Category,
+                            YearsExperience = 0,
+                            ProficiencyLevel = "Beginner"
+                        });
+                    }
+                }
+
+                _db.CandidateSkills.AddRange(matchedSkills);
+                await _db.SaveChangesAsync();
+
+                await tx.CommitAsync();
+
+                // 6. Final response
+                return new CandidateResponse
+                {
+                    CandidateId = candidate.CandidateId,
+                    FullName = candidate.FullName,
+                    Email = candidate.Email,
+                    Phone = candidate.Phone,
+                    CvPath = candidate.CvPath,
+                    Skills = matchedSkillResponses
+                };
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
+
+        private string ExtractPdfText(string filePath)
+        {
+            using var reader = new PdfReader(filePath);
+            using var pdfDoc = new PdfDocument(reader);
+
+            string text = "";
+
+            for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+            {
+                var page = pdfDoc.GetPage(i);
+                text += PdfTextExtractor.GetTextFromPage(page);
+                text += "\n";
+            }
+
+            return text;
         }
     }
 }

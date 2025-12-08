@@ -57,6 +57,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JobService>();
+builder.Services.AddScoped<CandidateService>(); 
+
 
 // Add Swagger with JWT Authorization
 builder.Services.AddEndpointsApiExplorer();
@@ -112,6 +114,8 @@ app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
+
 
 app.MapControllers();
 
