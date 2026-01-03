@@ -212,7 +212,6 @@ D:\Recruitment System\Recruitment System\obj\Debug\net8.0\Recruitment System.pdb
 D:\Recruitment System\Recruitment System\obj\Debug\net8.0\Recruitment System.genruntimeconfig.cache
 D:\Recruitment System\Recruitment System\obj\Debug\net8.0\ref\Recruitment System.dll
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\Recruitment System.staticwebassets.runtime.json
-D:\Recruitment System\Recruitment System\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.barcodes.dll
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.bouncy-castle-connector.dll
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.forms.dll

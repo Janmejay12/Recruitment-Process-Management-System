@@ -9,6 +9,8 @@ namespace Recruitment_System.Dto_s.CandidateDtos
         public string? CvPath { get; set; }
         public string ProfileStatus { get; set; } = "Applied";
         public bool IsActive { get; set; }
+        public int JobId { get; set; }
+        public string JobTitle { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public List<CandidateSkillResponse> Skills { get; set; } = new List<CandidateSkillResponse>();
@@ -21,5 +23,6 @@ namespace Recruitment_System.Dto_s.CandidateDtos
         public string Category { get; set; } = string.Empty;
         public int YearsExperience { get; set; }
         public string? ProficiencyLevel { get; set; }
+       
     }
 }

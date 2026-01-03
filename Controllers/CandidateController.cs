@@ -43,11 +43,11 @@ namespace Recruitment_System.Controllers
 
         [HttpPost ("upload-resume")]
         [Authorize(Roles = "Recruiter,Admin,HR")]
-        public async Task<IActionResult> UploadResume([FromForm] ResumeUploadRequest request)
+        public async Task<IActionResult> UploadResume([FromForm] ResumeUploadRequest request, [FromQuery] int jobId)
         {
             try
             {
-                var result = await _candidateService.UploadResumeAsync(request.File, GetCurrentUserId());
+                var result = await _candidateService.UploadResumeAsync(request.File, GetCurrentUserId(), jobId);
                 return Ok(new { IsSuccess = true, Message = "Resume processed successfully", Data = result });
             }
             catch (Exception ex)
@@ -55,6 +55,30 @@ namespace Recruitment_System.Controllers
                 return BadRequest(new { IsSuccess = false, Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Recruiter,HR,Admin")]
+        public async Task<IActionResult> GetAllCandidates()
+        {
+            try
+            {
+                var result = await _candidateService.GetAllCandidatesAsync();
+                return Ok(new
+                {
+                    IsSuccess = true,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
 
         private int GetCurrentUserId()
         {

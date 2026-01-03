@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recruitment_System.Data;
 
@@ -11,9 +12,11 @@ using Recruitment_System.Data;
 namespace Recruitment_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251210200747_AddJoAddJobIdToCandidate")]
+    partial class AddJoAddJobIdToCandidate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace Recruitment_System.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<int>("JobId")
+                    b.Property<int?>("JobId")
                         .HasColumnType("int");
 
                     b.Property<string>("Phone")
@@ -86,95 +89,6 @@ namespace Recruitment_System.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Candidates", (string)null);
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateJobReview", b =>
-                {
-                    b.Property<int>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
-
-                    b.Property<int?>("AssignedInterviewerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AssignedReviewerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CandidateId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("CurrentStage")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Screening");
-
-                    b.Property<int>("JobId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.HasKey("ReviewId");
-
-                    b.HasIndex("AssignedInterviewerId");
-
-                    b.HasIndex("AssignedReviewerId");
-
-                    b.HasIndex("CandidateId")
-                        .IsUnique();
-
-                    b.HasIndex("JobId");
-
-                    b.ToTable("CandidateJobReviews");
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateReviewComment", b =>
-                {
-                    b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"));
-
-                    b.Property<string>("CommentText")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<int>("CommentedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RoleAtTime")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("CommentId");
-
-                    b.HasIndex("CommentedByUserId");
-
-                    b.HasIndex("ReviewId");
-
-                    b.ToTable("CandidateReviewComments");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.CandidateSkill", b =>
@@ -216,41 +130,6 @@ namespace Recruitment_System.Migrations
                         .IsUnique();
 
                     b.ToTable("CandidateSkills", (string)null);
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateSkillEvaluation", b =>
-                {
-                    b.Property<int>("EvaluationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EvaluationId"));
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ReviewId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VerifiedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("YearsExperience")
-                        .HasColumnType("int");
-
-                    b.HasKey("EvaluationId");
-
-                    b.HasIndex("SkillId");
-
-                    b.HasIndex("VerifiedByUserId");
-
-                    b.HasIndex("ReviewId", "SkillId")
-                        .IsUnique();
-
-                    b.ToTable("CandidateSkillEvaluations");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.Job", b =>
@@ -673,8 +552,7 @@ namespace Recruitment_System.Migrations
                     b.HasOne("Recruitment_System.Entities.Job", "Job")
                         .WithMany("Candidates")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Recruitment_System.Entities.User", "User")
                         .WithMany()
@@ -686,58 +564,6 @@ namespace Recruitment_System.Migrations
                     b.Navigation("Job");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateJobReview", b =>
-                {
-                    b.HasOne("Recruitment_System.Entities.User", "AssignedInterviewer")
-                        .WithMany()
-                        .HasForeignKey("AssignedInterviewerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Recruitment_System.Entities.User", "AssignedReviewer")
-                        .WithMany()
-                        .HasForeignKey("AssignedReviewerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Recruitment_System.Entities.Candidate", "Candidate")
-                        .WithMany()
-                        .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Recruitment_System.Entities.Job", "Job")
-                        .WithMany()
-                        .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssignedInterviewer");
-
-                    b.Navigation("AssignedReviewer");
-
-                    b.Navigation("Candidate");
-
-                    b.Navigation("Job");
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateReviewComment", b =>
-                {
-                    b.HasOne("Recruitment_System.Entities.User", "CommentedByUser")
-                        .WithMany()
-                        .HasForeignKey("CommentedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Recruitment_System.Entities.CandidateJobReview", "Review")
-                        .WithMany("Comments")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CommentedByUser");
-
-                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.CandidateSkill", b =>
@@ -757,33 +583,6 @@ namespace Recruitment_System.Migrations
                     b.Navigation("Candidate");
 
                     b.Navigation("Skill");
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateSkillEvaluation", b =>
-                {
-                    b.HasOne("Recruitment_System.Entities.CandidateJobReview", "Review")
-                        .WithMany("SkillEvaluations")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Recruitment_System.Entities.Skill", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Recruitment_System.Entities.User", "VerifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("VerifiedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Review");
-
-                    b.Navigation("Skill");
-
-                    b.Navigation("VerifiedByUser");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.Job", b =>
@@ -870,13 +669,6 @@ namespace Recruitment_System.Migrations
                     b.Navigation("CandidateSkills");
 
                     b.Navigation("JobClosures");
-                });
-
-            modelBuilder.Entity("Recruitment_System.Entities.CandidateJobReview", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("SkillEvaluations");
                 });
 
             modelBuilder.Entity("Recruitment_System.Entities.Job", b =>

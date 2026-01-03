@@ -49,6 +49,16 @@
   },
   {
     "ContainingType": "Recruitment_System.Controllers.CandidateController",
+    "Method": "GetAllCandidates",
+    "RelativePath": "api/Candidate",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.CandidateController",
     "Method": "CreateCandidate",
     "RelativePath": "api/Candidate/manual",
     "HttpMethod": "POST",
@@ -74,6 +84,11 @@
       {
         "Name": "File",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "jobId",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],

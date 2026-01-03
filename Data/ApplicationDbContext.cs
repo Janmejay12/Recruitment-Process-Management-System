@@ -19,6 +19,10 @@ namespace Recruitment_System.Data
         public DbSet<JobClosure> JobClosures { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<CandidateSkill> CandidateSkills { get; set; }
+        public DbSet<CandidateJobReview> CandidateJobReviews { get; set; }
+        public DbSet<CandidateReviewComment> CandidateReviewComments { get; set; }
+        public DbSet<CandidateSkillEvaluation> CandidateSkillEvaluations { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,6 +39,10 @@ namespace Recruitment_System.Data
             ConfigureJobClosure(modelBuilder);
             ConfigureCandidate(modelBuilder);
             ConfigureCandidateSkill(modelBuilder);
+            ConfigureCandidateJobReview(modelBuilder);
+            ConfigureCandidateReviewComment(modelBuilder);
+            ConfigureCandidateSkillEvaluation(modelBuilder);
+
             // Seed data
             SeedData(modelBuilder);
         }
@@ -193,7 +201,7 @@ namespace Recruitment_System.Data
             modelBuilder.Entity<Candidate>()
                 .HasKey(c => c.CandidateId);
 
-            // FK: UserId ? User
+            // FK: UserId -> User
             modelBuilder.Entity<Candidate>()
                 .HasOne(c => c.User)
                 .WithMany() 
@@ -201,7 +209,13 @@ namespace Recruitment_System.Data
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired(false);
 
-            // FK: CreatedBy ? User
+            modelBuilder.Entity<Candidate>()
+                .HasOne(c => c.Job)
+                .WithMany(j => j.Candidates)
+                .HasForeignKey(c => c.JobId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // FK: CreatedBy -> User
             modelBuilder.Entity<Candidate>()
                 .HasOne(c => c.CreatedByUser)
                 .WithMany() 
@@ -254,6 +268,104 @@ namespace Recruitment_System.Data
                 .Property(cs => cs.UpdatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
         }
+
+        private void ConfigureCandidateJobReview(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasKey(r => r.ReviewId);
+
+            // One candidate ? one review (since one job only)
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasIndex(r => r.CandidateId)
+                .IsUnique();
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .Property(r => r.CurrentStage)
+                .HasDefaultValue("Screening");
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .Property(r => r.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .Property(r => r.UpdatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasOne(r => r.Candidate)
+                .WithMany()
+                .HasForeignKey(r => r.CandidateId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasOne(r => r.Job)
+                .WithMany()
+                .HasForeignKey(r => r.JobId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasOne(r => r.AssignedReviewer)
+                .WithMany()
+                .HasForeignKey(r => r.AssignedReviewerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CandidateJobReview>()
+                .HasOne(r => r.AssignedInterviewer)
+                .WithMany()
+                .HasForeignKey(r => r.AssignedInterviewerId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private void ConfigureCandidateReviewComment(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CandidateReviewComment>()
+                .HasKey(c => c.CommentId);
+
+            modelBuilder.Entity<CandidateReviewComment>()
+                .Property(c => c.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<CandidateReviewComment>()
+                .HasOne(c => c.Review)
+                .WithMany(r => r.Comments)
+                .HasForeignKey(c => c.ReviewId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CandidateReviewComment>()
+                .HasOne(c => c.CommentedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CommentedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private void ConfigureCandidateSkillEvaluation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CandidateSkillEvaluation>()
+                .HasKey(e => e.EvaluationId);
+
+            modelBuilder.Entity<CandidateSkillEvaluation>()
+                .HasIndex(e => new { e.ReviewId, e.SkillId })
+                .IsUnique();
+
+            modelBuilder.Entity<CandidateSkillEvaluation>()
+                .HasOne(e => e.Review)
+                .WithMany(r => r.SkillEvaluations)
+                .HasForeignKey(e => e.ReviewId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CandidateSkillEvaluation>()
+                .HasOne(e => e.Skill)
+                .WithMany()
+                .HasForeignKey(e => e.SkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CandidateSkillEvaluation>()
+                .HasOne(e => e.VerifiedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.VerifiedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
 
         private void SeedData(ModelBuilder modelBuilder)
         {

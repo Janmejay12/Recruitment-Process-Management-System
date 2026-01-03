@@ -4,6 +4,9 @@ namespace Recruitment_System.Dto_s.CandidateDtos
 {
     public class CreateCandidateRequest
     {
+        [Required]
+        public int JobId { get; set; }
+
         [Required, StringLength(100)]
         public string FullName { get; set; } = string.Empty;
 

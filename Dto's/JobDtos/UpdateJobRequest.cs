@@ -7,7 +7,7 @@ namespace Recruitment_System.Dto_s.JobDtos
         [StringLength(200, MinimumLength = 5, ErrorMessage = "Title must be between 5 and 200 characters")]
         public string? Title { get; set; }
 
-        [StringLength(2000, MinimumLength = 50, ErrorMessage = "Description must be between 50 and 2000 characters")]
+        [StringLength(2000, MinimumLength = 10, ErrorMessage = "Description must be between 50 and 2000 characters")]
         public string? Description { get; set; }
 
         [StringLength(100, ErrorMessage = "Location cannot exceed 100 characters")]

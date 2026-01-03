@@ -27,7 +27,8 @@ namespace Recruitment_System.Dto_s.JobDtos
         [Required(ErrorMessage = "Job level is required")]
         [RegularExpression("^(Junior|Mid-Level|Senior|Lead|Principal)$", ErrorMessage = "Invalid job level")]
         public string Level { get; set; } = string.Empty;
-
+        
+        [Required]
         [StringLength(100, ErrorMessage = "Salary range cannot exceed 100 characters")]
         public string? SalaryRange { get; set; }
 

@@ -72,5 +72,6 @@ namespace Recruitment_System.Entities
 
         public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
         public virtual ICollection<JobClosure> JobClosures { get; set; } = new List<JobClosure>();
+        public virtual ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
     }
 }

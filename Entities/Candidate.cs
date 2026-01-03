@@ -15,6 +15,10 @@ namespace Recruitment_System.Entities
         [ForeignKey("UserId")]
         public virtual User? User { get; set; } = null!;
 
+        public int JobId { get; set; }
+
+        [ForeignKey("JobId")]
+        public virtual Job Job { get; set; } = null;
         public int? CreatedBy { get; set; }
 
         [ForeignKey("CreatedBy")]

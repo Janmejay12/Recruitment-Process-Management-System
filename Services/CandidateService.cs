@@ -34,6 +34,7 @@ namespace Recruitment_System.Services
                 ProfileStatus = request.ProfileStatus ?? "Applied",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
+                JobId = request.JobId,
                 IsActive = true,
                 CreatedBy = createdByUserId // Track who created this candidate profile
             };
@@ -110,7 +111,7 @@ namespace Recruitment_System.Services
             };
         }
 
-        public async Task<CandidateResponse> UploadResumeAsync(IFormFile file, int uploadedByUserId)
+        public async Task<CandidateResponse> UploadResumeAsync(IFormFile file, int uploadedByUserId, int jobId)
         {
             if (file == null || file.Length == 0)
                 throw new InvalidOperationException("Invalid file");
@@ -154,6 +155,7 @@ namespace Recruitment_System.Services
                     ProfileStatus = "Imported",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
+                    JobId = jobId,
                     IsActive = true,
                     CreatedBy = uploadedByUserId
                 };
@@ -228,5 +230,40 @@ namespace Recruitment_System.Services
 
             return text;
         }
+
+        public async Task<List<CandidateResponse>> GetAllCandidatesAsync()
+        {
+            var candidates = await _db.Candidates
+                        .Include(c => c.Job)
+                .Include(c => c.CandidateSkills)
+                    .ThenInclude(cs => cs.Skill)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+
+            return candidates.Select(c => new CandidateResponse
+            {
+                CandidateId = c.CandidateId,
+                FullName = c.FullName,
+                Email = c.Email,
+                Phone = c.Phone,
+                CvPath = c.CvPath,
+                ProfileStatus = c.ProfileStatus,
+                IsActive = c.IsActive,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt,
+                JobId = c.JobId,
+                JobTitle = c.Job.Title,
+
+                Skills = c.CandidateSkills.Select(cs => new CandidateSkillResponse
+                {
+                    SkillId = cs.SkillId,
+                    SkillName = cs.Skill.SkillName,
+                    Category = cs.Skill.Category,
+                    YearsExperience = cs.YearsExperience,
+                    ProficiencyLevel = cs.ProficiencyLevel
+                }).ToList()
+            }).ToList();
+        }
+
     }
 }

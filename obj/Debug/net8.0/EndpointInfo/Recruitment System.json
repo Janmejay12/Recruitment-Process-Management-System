@@ -135,6 +135,16 @@
         "tags": [
           "Candidate"
         ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -158,6 +168,18 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Candidate": {
+      "get": {
+        "tags": [
+          "Candidate"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -581,10 +603,15 @@
       "CreateCandidateRequest": {
         "required": [
           "email",
-          "fullName"
+          "fullName",
+          "jobId"
         ],
         "type": "object",
         "properties": {
+          "jobId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "fullName": {
             "maxLength": 100,
             "minLength": 0,
@@ -629,6 +656,7 @@
           "location",
           "minExperience",
           "numberOfPositions",
+          "salaryRange",
           "title"
         ],
         "type": "object",
@@ -667,8 +695,7 @@
           "salaryRange": {
             "maxLength": 100,
             "minLength": 0,
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "employmentType": {
             "minLength": 1,
@@ -771,7 +798,7 @@
           },
           "description": {
             "maxLength": 2000,
-            "minLength": 50,
+            "minLength": 10,
             "type": "string",
             "nullable": true
           },
