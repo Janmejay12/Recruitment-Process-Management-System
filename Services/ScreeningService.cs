@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Recruitment_System.Data;
+using Recruitment_System.Dto_s.ScreeningDtos;
 using Recruitment_System.Entities;
 
 namespace Recruitment_System.Services
@@ -184,5 +185,124 @@ namespace Recruitment_System.Services
                 throw new InvalidOperationException(
                     $"Action not allowed in '{review.CurrentStage}' stage.");
         }
+
+        public async Task<List<ReviewPipelineItemDto>> GetReviewsByJobAsync(int jobId)
+        {
+            var reviews = await _db.CandidateJobReviews
+                .Include(r => r.Candidate)
+                .Include(r => r.AssignedReviewer)
+                .Include(r => r.AssignedInterviewer)
+                .Where(r => r.JobId == jobId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            return reviews.Select(r => new ReviewPipelineItemDto
+            {
+                ReviewId = r.ReviewId,
+                CandidateId = r.CandidateId,
+                CandidateName = r.Candidate.FullName,
+                CandidateEmail = r.Candidate.Email,
+                CurrentStage = r.CurrentStage,
+                ReviewerName = r.AssignedReviewer != null ? r.AssignedReviewer.FullName : null,
+                InterviewerName = r.AssignedInterviewer != null ? r.AssignedInterviewer.FullName : null,
+                CreatedAt = r.CreatedAt
+            }).ToList();
+        }
+
+
+        public async Task<ReviewDetailsDto> GetReviewDetailsAsync(int reviewId)
+        {
+            var review = await _db.CandidateJobReviews
+                .Include(r => r.Candidate)
+                    .ThenInclude(c => c.CandidateSkills)
+                        .ThenInclude(cs => cs.Skill)
+                .Include(r => r.Job)
+                    .ThenInclude(j => j.JobSkills)
+                        .ThenInclude(js => js.Skill)
+                .Include(r => r.SkillEvaluations)
+                    .ThenInclude(se => se.Skill)
+                .Include(r => r.SkillEvaluations)
+                    .ThenInclude(se => se.VerifiedByUser)
+                .Include(r => r.Comments)
+                    .ThenInclude(c => c.CommentedByUser)
+                .Include(r => r.AssignedReviewer)
+                .Include(r => r.AssignedInterviewer)
+                .FirstOrDefaultAsync(r => r.ReviewId == reviewId);
+
+            if (review == null)
+                throw new InvalidOperationException("Review not found.");
+
+            // History check (same email, other reviews)
+            var hasHistory = await _db.Candidates
+                .Where(c => c.Email == review.Candidate.Email && c.CandidateId != review.CandidateId)
+                .Join(_db.CandidateJobReviews,
+                      c => c.CandidateId,
+                      r => r.CandidateId,
+                      (c, r) => r)
+                .AnyAsync(r =>
+                    r.CurrentStage == "Interview" ||
+                    r.CurrentStage == "Rejected" ||
+                    r.CurrentStage == "Shortlisted");
+
+            return new ReviewDetailsDto
+            {
+                ReviewId = review.ReviewId,
+                CurrentStage = review.CurrentStage,
+
+                Candidate = new ReviewCandidateDto
+                {
+                    CandidateId = review.Candidate.CandidateId,
+                    FullName = review.Candidate.FullName,
+                    Email = review.Candidate.Email,
+                    Phone = review.Candidate.Phone,
+                    CvPath = review.Candidate.CvPath
+                },
+
+                Job = new ReviewJobDto
+                {
+                    JobId = review.Job.JobId,
+                    Title = review.Job.Title
+                },
+
+                JobRequiredSkills = review.Job.JobSkills.Select(js => new ReviewJobSkillDto
+                {
+                    SkillId = js.SkillId,
+                    SkillName = js.Skill.SkillName,
+                    IsMandatory = js.IsMandatory,
+                    Priority = js.Priority
+                }).ToList(),
+
+                ResumeSkills = review.Candidate.CandidateSkills.Select(cs => new ReviewResumeSkillDto
+                {
+                    SkillId = cs.SkillId,
+                    SkillName = cs.Skill.SkillName,
+                    YearsExperience = cs.YearsExperience
+                }).ToList(),
+
+                VerifiedSkills = review.SkillEvaluations.Select(se => new ReviewVerifiedSkillDto
+                {
+                    SkillId = se.SkillId,
+                    SkillName = se.Skill.SkillName,
+                    YearsExperience = se.YearsExperience,
+                    VerifiedBy = se.VerifiedByUser.FullName
+                }).ToList(),
+
+                Comments = review.Comments
+                    .OrderByDescending(c => c.CreatedAt)
+                    .Select(c => new ReviewCommentDto
+                    {
+                        CommentText = c.CommentText,
+                        CommentedBy = c.CommentedByUser.FullName,
+                        RoleAtTime = c.RoleAtTime,
+                        CreatedAt = c.CreatedAt
+                    }).ToList(),
+
+                AssignedReviewerName = review.AssignedReviewer?.FullName,
+                AssignedInterviewerName = review.AssignedInterviewer?.FullName,
+
+                HasPreviousHistory = hasHistory
+            };
+        }
+
     }
 }

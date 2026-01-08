@@ -165,6 +165,38 @@ namespace Recruitment_System.Controllers
             }
         }
 
+        [HttpGet("job/{jobId}")]
+        [Authorize(Roles = "Recruiter,HR,Admin,Reviewer")]
+        public async Task<IActionResult> GetReviewsByJob([FromRoute] int jobId)
+        {
+            try
+            {
+                var data = await _screeningService.GetReviewsByJobAsync(jobId);
+                return Ok(new { IsSuccess = true, Data = data });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("{reviewId}")]
+        [Authorize(Roles = "Recruiter,HR,Admin,Reviewer,Interviewer")]
+        public async Task<IActionResult> GetReviewDetails([FromRoute] int reviewId)
+        {
+            try
+            {
+                var data = await _screeningService.GetReviewDetailsAsync(reviewId);
+                return Ok(new { IsSuccess = true, Data = data });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

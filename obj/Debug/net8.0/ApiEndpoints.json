@@ -251,5 +251,169 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "AssignReviewer",
+    "RelativePath": "api/Screening/{id}/assign-reviewer",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.ScreeningDtos.AssignReviewerRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "AddComment",
+    "RelativePath": "api/Screening/{id}/comment",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.ScreeningDtos.AddCommentRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "Reject",
+    "RelativePath": "api/Screening/{id}/reject",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "Shortlist",
+    "RelativePath": "api/Screening/{id}/shortlist",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.ScreeningDtos.ShortlistRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "SaveSkillEvaluation",
+    "RelativePath": "api/Screening/{id}/skills",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.ScreeningDtos.SkillEvaluationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "GetReviewDetails",
+    "RelativePath": "api/Screening/{reviewId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "reviewId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "CreateReview",
+    "RelativePath": "api/Screening/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Recruitment_System.Dto_s.ScreeningDtos.CreateReviewRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "CheckHistory",
+    "RelativePath": "api/Screening/history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.ScreeningController",
+    "Method": "GetReviewsByJob",
+    "RelativePath": "api/Screening/job/{jobId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "jobId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

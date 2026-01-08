@@ -225,3 +225,4 @@ D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.styledxmlparser.
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.svg.dll
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\itext.commons.dll
 D:\Recruitment System\Recruitment System\bin\Debug\net8.0\Microsoft.DotNet.PlatformAbstractions.dll
+D:\Recruitment System\Recruitment System\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
