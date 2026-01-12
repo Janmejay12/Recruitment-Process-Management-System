@@ -145,6 +145,7 @@ namespace Recruitment_System.Services
                 Status = j.Status,
                 CreatedBy = j.CreatedByUser.FullName,
                 CreatedAt = j.CreatedAt,
+                IsActive = j.IsActive,
                 UpdatedAt = j.UpdatedAt,
                 SkillsCount = j.JobSkills.Count
             }).ToList();

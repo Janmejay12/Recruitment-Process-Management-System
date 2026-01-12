@@ -59,6 +59,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JobService>();
 builder.Services.AddScoped<CandidateService>();
 builder.Services.AddScoped<ScreeningService>();
+builder.Services.AddScoped<InterviewService>();
 
 
 // Add Swagger with JWT Authorization

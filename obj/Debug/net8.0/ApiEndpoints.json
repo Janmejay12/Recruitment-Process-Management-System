@@ -415,5 +415,25 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.SkillController",
+    "Method": "GetAllSkills",
+    "RelativePath": "api/Skill",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Recruitment_System.Controllers.UserController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/User",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   }
 ]

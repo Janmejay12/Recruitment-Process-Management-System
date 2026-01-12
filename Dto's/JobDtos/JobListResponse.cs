@@ -13,6 +13,8 @@ namespace Recruitment_System.Dto_s.JobDtos
         public string Status { get; set; } = string.Empty;
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public bool IsActive { get; set; }
+
         public DateTime UpdatedAt { get; set; }
         public int SkillsCount { get; set; }
     }

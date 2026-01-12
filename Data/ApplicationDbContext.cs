@@ -22,7 +22,10 @@ namespace Recruitment_System.Data
         public DbSet<CandidateJobReview> CandidateJobReviews { get; set; }
         public DbSet<CandidateReviewComment> CandidateReviewComments { get; set; }
         public DbSet<CandidateSkillEvaluation> CandidateSkillEvaluations { get; set; }
-
+        public DbSet<InterviewProcess> InterviewProcesses { get; set; }
+        public DbSet<InterviewRound> InterviewRounds { get; set; }
+        public DbSet<InterviewPanelMember> InterviewPanelMembers { get; set; }
+        public DbSet<InterviewFeedback> InterviewFeedbacks { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,6 +45,10 @@ namespace Recruitment_System.Data
             ConfigureCandidateJobReview(modelBuilder);
             ConfigureCandidateReviewComment(modelBuilder);
             ConfigureCandidateSkillEvaluation(modelBuilder);
+            ConfigureInterviewProcess(modelBuilder);
+            ConfigureInterviewRound(modelBuilder);
+            ConfigureInterviewPanelMember(modelBuilder);
+            ConfigureInterviewFeedback(modelBuilder);
 
             // Seed data
             SeedData(modelBuilder);
@@ -365,6 +372,88 @@ namespace Recruitment_System.Data
                 .HasForeignKey(e => e.VerifiedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        private void ConfigureInterviewProcess(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InterviewProcess>()
+                .HasKey(p => p.InterviewProcessId);
+
+            // One review ? one interview process
+            modelBuilder.Entity<InterviewProcess>()
+                .HasIndex(p => p.ReviewId)
+                .IsUnique();
+
+            modelBuilder.Entity<InterviewProcess>()
+                .Property(p => p.Status)
+                .HasDefaultValue("NotStarted");
+
+            modelBuilder.Entity<InterviewProcess>()
+                .HasOne(p => p.Review)
+                .WithMany()
+                .HasForeignKey(p => p.ReviewId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private void ConfigureInterviewRound(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InterviewRound>()
+                .HasKey(r => r.InterviewRoundId);
+
+            modelBuilder.Entity<InterviewRound>()
+                .HasIndex(r => new { r.InterviewProcessId, r.RoundNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<InterviewRound>()
+                .HasOne(r => r.InterviewProcess)
+                .WithMany(p => p.Rounds)
+                .HasForeignKey(r => r.InterviewProcessId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private void ConfigureInterviewPanelMember(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InterviewPanelMember>()
+                .HasKey(p => p.InterviewPanelMemberId);
+
+            modelBuilder.Entity<InterviewPanelMember>()
+                .HasIndex(p => new { p.InterviewRoundId, p.InterviewerUserId })
+                .IsUnique();
+
+            modelBuilder.Entity<InterviewPanelMember>()
+                .HasOne(p => p.InterviewRound)
+                .WithMany(r => r.PanelMembers)
+                .HasForeignKey(p => p.InterviewRoundId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InterviewPanelMember>()
+                .HasOne(p => p.Interviewer)
+                .WithMany()
+                .HasForeignKey(p => p.InterviewerUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private void ConfigureInterviewFeedback(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InterviewFeedback>()
+                .HasKey(f => f.InterviewFeedbackId);
+
+            modelBuilder.Entity<InterviewFeedback>()
+                .HasIndex(f => new { f.InterviewRoundId, f.InterviewerUserId })
+                .IsUnique();
+
+            modelBuilder.Entity<InterviewFeedback>()
+                .HasOne(f => f.InterviewRound)
+                .WithMany(r => r.Feedbacks)
+                .HasForeignKey(f => f.InterviewRoundId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InterviewFeedback>()
+                .HasOne(f => f.Interviewer)
+                .WithMany()
+                .HasForeignKey(f => f.InterviewerUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
 
 
         private void SeedData(ModelBuilder modelBuilder)
